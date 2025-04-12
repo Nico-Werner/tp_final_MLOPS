@@ -16,7 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from sklearn.metrics.pairwise import cosine_similarity
-import joblib  # Use joblib directly instead of sklearn.externals.joblib
+import joblib 
 
 import mlflow
 import mlflow.sklearn
@@ -25,7 +25,6 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 
-# Define default arguments for the DAG
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -35,22 +34,19 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-# Define the DAG
 dag = DAG(
     'wine_sentiment_analysis',
     default_args=default_args,
     description='Wine reviews sentiment analysis and recommendation engine',
-    schedule_interval=timedelta(days=1),  # Run daily
+    schedule_interval=timedelta(days=1),
     start_date=datetime(2025, 4, 12),
     catchup=False,
     tags=['wine', 'sentiment_analysis', 'mlops'],
 )
 
-# Define the path to data
 DATA_PATH = '/opt/airflow/data/wine_profiles6.csv'
-MLFLOW_TRACKING_URI = "http://mlflow:5000"  # MLflow server URL
+MLFLOW_TRACKING_URI = "http://mlflow:5000" 
 
-# Configuring the S3 endpoint (MinIO)
 os.environ['MLFLOW_S3_ENDPOINT_URL'] = "http://s3:9000"
 EXPERIMENT_NAME = "wine-sentiment-analysis"
 
@@ -61,7 +57,6 @@ def load_data(**kwargs):
         df = pd.read_csv(DATA_PATH)
         print(f"Data loaded successfully with shape: {df.shape}")
         
-        # List of required columns
         required_cols = [
             'wine_id', 'variedad', 'sentiment_label', 'polarity', 
             'full_text', 'price', 'title'
@@ -71,11 +66,9 @@ def load_data(**kwargs):
         missing_cols = [col for col in required_cols if col not in df.columns]
         if missing_cols:
             print(f"Warning: Missing columns in dataset: {missing_cols}")
-            # Add missing columns with default values if needed
             for col in missing_cols:
                 df[col] = None
                 
-        # Pass the DataFrame to the next task
         kwargs['ti'].xcom_push(key='wine_df', value=df.to_json(orient='split'))
         return "Data loaded successfully"
     except Exception as e:
