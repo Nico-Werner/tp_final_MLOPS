@@ -1,8 +1,9 @@
 # MLOps1 - CEIA - FIUBA
 
 ### Integrantes:
-Nicolás Werner (a1825)
 Pablo Menardi (a1814)
+
+Nicolás Werner (a1825)
 
 #### Aclaraciones
 
